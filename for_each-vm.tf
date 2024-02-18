@@ -1,6 +1,6 @@
 
 resource "yandex_compute_instance" "second" {
-    for_each = 
+   
   
 name = each.value.vm_name
 
