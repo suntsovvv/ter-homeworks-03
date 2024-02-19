@@ -81,8 +81,15 @@ name = var.each_vm[each.value]["vm_name"]
 
 ```
 ![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/2394e4bb-c9bd-42b3-a6e3-503ca860afef)   
-
 3 -   
+```hcl
+resource "yandex_compute_instance" "example" {
+  count = 2
+  depends_on = [yandex_compute_instance.second]
+  name        = "web-${count.index + 1}"
+  platform_id = "standard-v1"
+```
+4 -   
 ```hcl
 locals{
     vms_metadata = {
