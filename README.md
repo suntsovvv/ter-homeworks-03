@@ -1,6 +1,6 @@
 # Домашнее задание к занятию «Управляющие конструкции в коде Terraform»
 ### Задание 1   
-![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/72ed2a77-5967-4054-8c3b-07ddc47eccbf)
+![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/72ed2a77-5967-4054-8c3b-07ddc47eccbf)   
 ### Задание 2   
 1 -   
 ```hcl
@@ -44,7 +44,7 @@ resource "yandex_compute_instance" "example" {
 ```
 ![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/de064eb1-4819-4fe7-8118-9534f1c6d43b)
 ![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/061f23b2-665c-49ab-86b4-a21553e2d5f7)
-![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/c9d7deab-4781-46b2-b6af-87a2d0275d3c)
+![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/c9d7deab-4781-46b2-b6af-87a2d0275d3c)   
 2 -   
 ```hcl
 resource "yandex_compute_instance" "second" {
@@ -99,3 +99,44 @@ locals{
 }
 
 ```
+### Задание    
+```hcl
+resource "yandex_compute_disk" "disks" {
+  count   = 3
+  name  = "disk-${count.index + 1}"
+  type = "network-hdd"
+  size  = 1
+
+}
+
+
+resource "yandex_compute_instance" "storage" {
+  name = "storage"
+  resources {
+    cores = 2
+    memory = 1
+    core_fraction = 5
+  }
+
+  boot_disk {
+    initialize_params {
+    image_id = data.yandex_compute_image.ubuntu-2004-lts.image_id
+        }
+  }
+
+  dynamic "secondary_disk" {
+   for_each = { for stor in yandex_compute_disk.disks[*]: stor.name=> stor }
+   content {
+     disk_id = secondary_disk.value.id
+   }
+  }
+  network_interface {
+     subnet_id = yandex_vpc_subnet.develop.id
+     nat     = true
+  }
+
+  metadata = local.vms_metadata
+}
+```
+![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/8b243315-9292-4e69-8bd5-389d030b18aa)
+
