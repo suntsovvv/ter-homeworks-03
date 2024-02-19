@@ -99,7 +99,7 @@ locals{
 }
 
 ```
-### Задание    
+### Задание 3    
 ```hcl
 resource "yandex_compute_disk" "disks" {
   count   = 3
