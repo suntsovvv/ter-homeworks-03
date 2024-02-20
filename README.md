@@ -138,5 +138,53 @@ resource "yandex_compute_instance" "storage" {
   metadata = local.vms_metadata
 }
 ```
-![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/8b243315-9292-4e69-8bd5-389d030b18aa)
+![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/8b243315-9292-4e69-8bd5-389d030b18aa)   
+### Задание 4
+Файл inventory.tftpl:
+```
+[webservers]
+
+%{~ for i in webservers ~}
+${i["name"]}   ansible_host=${i["network_interface"][0]["nat_ip_address"]} fqdn=${i["fqdn"]}
+%{~ endfor ~}
+
+[databases]
+
+%{~ for i in databases ~}
+${i["name"]}   ansible_host=${i["network_interface"][0]["nat_ip_address"]} fqdn=${i["fqdn"]}
+%{~ endfor ~}
+
+[storage]
+
+%{~ for i in storage ~}
+${i["name"]}   ansible_host=${i["network_interface"][0]["nat_ip_address"]} fqdn=${i["fqdn"]}
+%{~ endfor ~}
+```
+Файл inventory:
+```
+[webservers]
+web-1   ansible_host=158.160.37.193 fqdn=fhmjbrh67g7akcu7iql2.auto.internalweb-2   ansible_host=158.160.49.223 fqdn=fhmlje668fenfo0guoj6.auto.internal
+[databases]
+main   ansible_host=158.160.36.154 fqdn=fhmc7djm5ksd0dg4k0n9.auto.internalreplica   ansible_host=158.160.35.129 fqdn=fhmd2tooar1tkm1c7op0.auto.internal
+[storage]
+storage   ansible_host=158.160.39.120 fqdn=fhm7q2sfgj2f5n07455a.auto.internal
+```
+Файл ansible.tf:
+```hcl
+resource "local_file" "inventory_cfg" {
+  content = templatefile("${path.module}/inventory.tftpl",
+    { 
+    webservers =  yandex_compute_instance.example,
+    databases =  yandex_compute_instance.second, 
+    storage =  [yandex_compute_instance.storage]   
+   # fqdn =  
+    }  
+)
+
+  filename = "${abspath(path.module)}/inventory"
+}
+```
+![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/d31c2836-6512-4a2c-81d9-1ce9b68455f9)
+
+
 
