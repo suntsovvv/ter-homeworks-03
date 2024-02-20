@@ -4,7 +4,7 @@ data "yandex_compute_image" "ubuntu-2004-lts" {
 
 resource "yandex_compute_instance" "example" {
   count = 2
-
+  depends_on = [yandex_compute_instance.second]
   name        = "web-${count.index + 1}"
   platform_id = "standard-v1"
 
@@ -23,9 +23,9 @@ resource "yandex_compute_instance" "example" {
     }
   }
 
-  metadata = {
-    ssh-keys = "ubuntu:${var.public_key}"
-  }
+  metadata = local.vms_metadata
+
+  
 
   scheduling_policy { preemptible = true }
 
@@ -35,5 +35,6 @@ resource "yandex_compute_instance" "example" {
     security_group_ids = [yandex_vpc_security_group.example.id]
     nat                = true
   }
+  
   allow_stopping_for_update = true
 }

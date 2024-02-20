@@ -1,32 +1,24 @@
 
 resource "yandex_compute_instance" "second" {
-   
+  for_each = toset (keys({for i, r in var.each_vm:  i => r}) )
   
-name = each.value.vm_name
+name = var.each_vm[each.value]["vm_name"]
 
-  /*
-   for_each = var.count_vm
-    name = each.value.vm_name
-    platform_id = "standard-v1"
- */   
- 
-  resources {
-    cores         = each.value.cpu
-    memory        = each.value.memory
-    core_fraction = each.value.core_fraction
+   resources {
+    cores         = var.each_vm[each.value]["cpu"]
+    memory        = var.each_vm[each.value]["ram"]
+    core_fraction = 5
   }
 
   boot_disk {
     initialize_params {
       image_id = data.yandex_compute_image.ubuntu-2004-lts.image_id
       type     = "network-hdd"
-      size     = 5
+      size     =  var.each_vm[each.value]["disk_volume"]
     }
   }
 
-  metadata = {
-    ssh-keys = "ubuntu:${var.public_key}"
-  }
+  metadata = local.vms_metadata
 
   scheduling_policy { preemptible = true }
 

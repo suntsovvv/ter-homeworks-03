@@ -48,7 +48,7 @@ variable "each_vm" {
   }))
   default = [ {
     vm_name     = "main"
-    cpu         = 1
+    cpu         = 4
     ram         = 2
     disk_volume = 5
     },
