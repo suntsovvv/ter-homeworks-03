@@ -186,5 +186,57 @@ resource "local_file" "inventory_cfg" {
 ```
 ![image](https://github.com/suntsovvv/ter-homeworks-03/assets/154943765/d31c2836-6512-4a2c-81d9-1ce9b68455f9)
 
+### Задание 5*
 
+```hcl
+output "all_vms" {
+  description = "Information about the instances"
+  value = {
+    web = [
+      for instance in yandex_compute_instance.example : {
+        name = instance.name
+        id   = instance.id
+        fqdn = instance.fqdn
+      }
+    ],
 
+    db = [
+          for instance in yandex_compute_instance.second : {
+        name = instance.name
+        id   = instance.id
+        fqdn = instance.fqdn
+        }
+        ]
+         
+}
+}
+```
+```
+user@study:~/home_work/ter-homeworks/ter-homeworks-03/ter-homeworks-03$ terraform output
+all_vms = {
+  "db" = [
+    {
+      "fqdn" = "fhmc7djm5ksd0dg4k0n9.auto.internal"
+      "id" = "fhmc7djm5ksd0dg4k0n9"
+      "name" = "main"
+    },
+    {
+      "fqdn" = "fhmd2tooar1tkm1c7op0.auto.internal"
+      "id" = "fhmd2tooar1tkm1c7op0"
+      "name" = "replica"
+    },
+  ]
+  "web" = [
+    {
+      "fqdn" = "fhmjbrh67g7akcu7iql2.auto.internal"
+      "id" = "fhmjbrh67g7akcu7iql2"
+      "name" = "web-1"
+    },
+    {
+      "fqdn" = "fhmlje668fenfo0guoj6.auto.internal"
+      "id" = "fhmlje668fenfo0guoj6"
+      "name" = "web-2"
+    },
+  ]
+}
+```
