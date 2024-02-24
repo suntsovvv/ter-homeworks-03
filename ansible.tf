@@ -11,11 +11,7 @@ resource "local_file" "inventory_cfg" {
   filename = "${abspath(path.module)}/inventory.cfg"
 }
 
-variable "web_provision" {
-  type    = bool
-  default = true
-  description="ansible provision switch variable"
-}
+
 resource "random_password" "each" {
   for_each    = toset([for k, v in yandex_compute_instance.example : v.name ])
   length = 17

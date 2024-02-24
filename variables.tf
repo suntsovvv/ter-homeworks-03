@@ -35,27 +35,73 @@ variable "public_key" {
 
 }
 variable "count_vm" {
-  default = { cores = 2, memory = 1, core_fraction = 20 }
+  default = { name = "web", cores = 2, memory = 1, core_fraction = 20,  platform_id = "standard-v1", count = 2}
 }
 
 variable "each_vm" {
-  description = "vm_parameters"
+  description = "eachvm_parameters"
   type = list(object({
     vm_name     = string,
     cpu         = number,
     ram         = number,
-    disk_volume = number
+    disk_volume = number,
+    core_fraction = number
   }))
   default = [ {
     vm_name     = "main"
     cpu         = 4
     ram         = 2
     disk_volume = 5
+    core_fraction = 5
+
     },
     {
       vm_name     = "replica"
       cpu         = 2
       ram         = 1
       disk_volume = 8
+      core_fraction = 5
   }]
+}
+variable "web_provision" {
+  type    = bool
+  default = true
+  description="ansible provision switch variable"
+}
+variable "vm_storage" {
+  type = map
+  default = {
+name = "storage"
+cores = 2
+memory = 1 
+core_fraction = 5
+  }
+  }
+  variable "vm_nat" {
+  type = bool
+  default = true
+  }
+  
+  variable "vm_disks_stor" {
+    type = map
+  default = {
+  count   = 3
+  name  = "disk"
+  type = "network-hdd"
+  size  = 1
+  }
+  }
+   variable "vm_disks_cuontvm" {
+    type = map
+  default = {
+  type = "network-hdd"
+  size  = 5
+
+  }
+}
+variable "sh_pol" {
+ default = true
+}
+variable "allow_stopping" {
+  default = true
 }
