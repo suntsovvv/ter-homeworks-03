@@ -89,10 +89,10 @@ name = var.each_vm[each.value]["vm_name"]
 3 -   
 ```hcl
 resource "yandex_compute_instance" "example" {
-  count = 2
+  count = var.count_vm.count
   depends_on = [yandex_compute_instance.second]
-  name        = "web-${count.index + 1}"
-  platform_id = "standard-v1"
+  name        = "${var.count_vm.name}-${count.index + 1}"
+  platform_id = var.count_vm.platform_id
 ```
 4 -   
 ```hcl
@@ -106,21 +106,22 @@ locals{
 ```
 ### Задание 3    
 ```hcl
+
 resource "yandex_compute_disk" "disks" {
-  count   = 3
-  name  = "disk-${count.index + 1}"
-  type = "network-hdd"
-  size  = 1
+  count   = var.vm_disks_stor.count
+  name  = "${var.vm_disks_stor.name}-${count.index + 1}"
+  type = var.vm_disks_stor.type
+  size  = var.vm_disks_stor.size
 
 }
 
 
 resource "yandex_compute_instance" "storage" {
-  name = "storage"
+  name = var.vm_storage.name
   resources {
-    cores = 2
-    memory = 1
-    core_fraction = 5
+    cores = var.vm_storage.cores
+    memory = var.vm_storage.memory
+    core_fraction = var.vm_storage.core_fraction
   }
 
   boot_disk {
@@ -130,16 +131,19 @@ resource "yandex_compute_instance" "storage" {
   }
 
   dynamic "secondary_disk" {
-   for_each = { for stor in yandex_compute_disk.disks[*]: stor.name=> stor }
-   content {
+   for_each =  yandex_compute_disk.disks
+     content {
+
      disk_id = secondary_disk.value.id
+     
    }
   }
+  scheduling_policy { preemptible = var.sh_pol }
   network_interface {
      subnet_id = yandex_vpc_subnet.develop.id
-     nat     = true
+     nat     = var.vm_nat
   }
-
+ allow_stopping_for_update = var.allow_stopping
   metadata = local.vms_metadata
 }
 ```
